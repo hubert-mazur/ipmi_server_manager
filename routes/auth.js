@@ -5,39 +5,39 @@ const validationSchemas = require('../validationSchemas');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-router.post("/register", async (request, response) => {
-    const {error} = validationSchemas.registerValidation(request.body);
-    if (error) {
-        response.status(400).send(error)
-    }
+// router.post("/register", async (request, response) => {
+//     const {error} = validationSchemas.registerValidation(request.body);
+//     if (error) {
+//         response.status(400).send(error)
+//     }
 
-    // user already in DB ?
-    const emailExists = await User.findOne({email: request.body.email})
-    if (emailExists) {
-      return response.status(400).send( {message: 'Email is already in Database'})
-    }
+//     // user already in DB ?
+//     const emailExists = await User.findOne({email: request.body.email})
+//     if (emailExists) {
+//       return response.status(400).send( {message: 'Email is already in Database'})
+//     }
 
-    // Password hashing
-    const salt = await bcrypt.genSalt();
-    const hashedPassword = await bcrypt.hash(request.body.password, salt);
+//     // Password hashing
+//     const salt = await bcrypt.genSalt();
+//     const hashedPassword = await bcrypt.hash(request.body.password, salt);
 
-    const user = new User({
-    name: request.body.name,
-    lastName: request.body.lastName,
-    email: request.body.email,
-    password: hashedPassword,
-  });
+//     const user = new User({
+//     name: request.body.name,
+//     lastName: request.body.lastName,
+//     email: request.body.email,
+//     password: hashedPassword,
+//   });
 
-  try {
-    const savedUserData = await user.save();
-    response.send({user: savedUserData._id});
-  } catch (err) {
-    response.status(400).send(err);
-  }
-});
+//   try {
+//     const savedUserData = await user.save();
+//     response.send({user: savedUserData._id});
+//   } catch (err) {
+//     response.status(400).send(err);
+//   }
+// });
 
 
-router.post("/login", async (request, response) => {
+router.post("/", async (request, response) => {
   
   const {error} = validationSchemas.loginValifation(request.body);
   if (error) {
