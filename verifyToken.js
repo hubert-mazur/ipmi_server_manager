@@ -20,4 +20,3 @@ module.exports = function auth(request, response, next) {
         response.status(400).send('Invalid Token');
     }
 }
-
