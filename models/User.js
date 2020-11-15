@@ -29,16 +29,6 @@ const userSchema = new mongoose.Schema({
     default: false
   },
 
-  groups: {
-    type: Array,
-    default: []
-  },
-
-  machines: {
-    type: Array,
-    default: []
-  },
-
   timestamp: {
     type: Date,
     default: Date.now,

@@ -2,15 +2,24 @@ const { request, response } = require("express");
 const { expression } = require("joi");
 const router = require("express").Router();
 const auth = require("../verifyToken");
-const validationSchemas = require("../validationSchemas");
+const validation = require("../validationSchemas/user");
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
+const e = require("express");
+const admin = require("../admins");
 
 // add a new user to database
 
 router.post("/", auth, async (request, response) => {
+  // check if user is Admin
+  if (!admin(request._id)) {
+    return response
+      .status(401)
+      .send({ message: "You are not allowed to create users" });
+  }
+
   //validate user data
-  const { error } = validationSchemas.registerValidation(request.body);
+  const { error } = validation.registerValidation(request.body);
 
   if (error) {
     response.status(400).send(error);
@@ -45,6 +54,12 @@ router.post("/", auth, async (request, response) => {
 
 // delete user with given _id
 router.delete("/:id", auth, async (request, response) => {
+  if (!admin(request._id) && request.params.id != request._id) {
+    return response
+      .status(401)
+      .send({ message: "You are not allowed to delete other users" });
+  }
+
   const deleted = User.deleteOne({ _id: request.params.id }, function (err) {
     if (err) {
       return response.status(400).send(err);
@@ -58,15 +73,26 @@ router.delete("/:id", auth, async (request, response) => {
 
 // get all users in DB
 router.get("/", auth, async (request, response) => {
+  selection = {};
+
+  if (!admin(request._id)) {
+    selection = { _id: request._id };
+  }
+
   const users = await User.find().select("-password");
+
   if (!users) {
     return response.status(400).response(users);
   }
 
-  return response.status(200).send(request._id);
+  return response.status(200).send(users);
 });
 
 router.patch("/:id/name", auth, async (request, response) => {
+  if (!admin(request._id) && request._id != request.params.id) {
+    return response.status(401).send({ message: "You are not admin" });
+  }
+
   const user = User.findOneAndUpdate(
     { _id: request.params.id },
     { name: request.body.name },
@@ -79,6 +105,10 @@ router.patch("/:id/name", auth, async (request, response) => {
 });
 
 router.patch("/:id/email", auth, async (request, response) => {
+  if (!admin(request._id) && request._id != request.params.id) {
+    return response.status(401).send({ message: "You are not admin" });
+  }
+
   const user = User.findOneAndUpdate(
     { _id: request.params.id },
     { email: request.body.email },
@@ -91,6 +121,10 @@ router.patch("/:id/email", auth, async (request, response) => {
 });
 
 router.patch("/:id/lastName", auth, async (request, response) => {
+  if (!admin(request._id) && request._id != request.params.id) {
+    return response.status(401).send({ message: "You are not admin" });
+  }
+
   const user = User.findOneAndUpdate(
     { _id: request.params.id },
     { lastName: request.body.lastName },
@@ -103,6 +137,10 @@ router.patch("/:id/lastName", auth, async (request, response) => {
 });
 
 router.patch("/:id/password", auth, async (request, response) => {
+  if (!admin(request._id) && request._id != request.params.id) {
+    return response.status(401).send({ message: "You are not admin" });
+  }
+
   const user = User.findOne({ _id: request.params.id });
   if (!user) return response.status(400).send({ message: "user not found" });
   compareStatus = await bcrypt.compare(

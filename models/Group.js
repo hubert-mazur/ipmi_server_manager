@@ -7,8 +7,14 @@ const groupSchema = new mongoose.Schema({
         max: 30
     },
 
+    users: {
+        type: Array,
+        default: []
+    },
+
     machines: {
-        type: Array
+        type: Array,
+        default: []
     }
 });
 
