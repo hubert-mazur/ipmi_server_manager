@@ -15,6 +15,7 @@ const authRoute = require('./routes/auth');
 const apiRoute = require('./routes/landing_page');
 const userRoute = require('./routes/user_management');
 const groupRoute = require('./routes/group');
+const machineRoute = require('./routes/machine');
 
 // Middlewares
 app.use(express.json());    
@@ -25,7 +26,7 @@ app.use('/api/login', authRoute);
 app.use('/api/landing', apiRoute);
 app.use('/api/user', userRoute);
 app.use('/api/group', groupRoute);
-
+app.use('/api/machine', machineRoute);
 
 app.listen(3000, () => {
     console.log('Server started')
