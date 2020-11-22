@@ -1,0 +1,431 @@
+{
+	"info": {
+		"_postman_id": "f4f0466e-0593-4b03-90ba-602e4b803c9c",
+		"name": "user",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "http://localhost:3000/api/user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "bd585896-62ba-42de-a5cb-f6c37a6be466",
+						"exec": [
+							"pm.test(\"Add a new user\", () => {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.body();",
+							"    typeof(pm.response.user) == String",
+							"    var data = pm.response.json();",
+							"    pm.globals.set('user', data.user)",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "7d9633ab-a0c8-4335-b8fc-925d70385261",
+						"exec": [
+							"var data = pm.request.body.toJSON();",
+							"pm.globals.set('userPass', data.password)"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "auth-token",
+						"value": "{{auth-token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"testUser2@localhost.com\",\n    \"password\": \"rootroot\",\n    \"name\": \"test\",\n    \"lastName\": \"user\"\n\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/user",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"user"
+					]
+				},
+				"description": "Add new user"
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:3000/api/user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "476eefbc-5ed6-4571-80bd-5edd03631ba0",
+						"exec": [
+							"pm.test(\"Delete user\", () => {",
+							"    pm.response.to.have.status(200);",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "auth-token",
+						"value": "{{auth-token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/user/{{user}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"user",
+						"{{user}}"
+					]
+				},
+				"description": "Delete user with given id"
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:3000/api/user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "9c2a7225-801e-4453-853f-83149ad982e9",
+						"exec": [
+							"pm.test(\"Get list of users\", () => {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.jsonBody();",
+							"",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "auth-token",
+						"value": "{{auth-token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/user",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"user"
+					]
+				},
+				"description": "Get all users in db (if admin else current_user)"
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:3000/api/user/{{user}}lastName",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "3aa684d5-117c-428b-8bee-b41bc9cdab0a",
+						"exec": [
+							"pm.test(\"Change user LastName\", () => {",
+							"    pm.response.to.have.status(200);",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "auth-token",
+						"value": "{{auth-token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"lastName\": \"root\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/user/{{user}}/lastName",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"user",
+						"{{user}}",
+						"lastName"
+					]
+				},
+				"description": "Update information about users, giving, requestis:\nhttp://localhost:3000/api/user/:id/name\nwhere id is DB users _id. Can change <name> to any other property in user schema, like \"lastName\""
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:3000/api/user/{{user}}/name",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f68d727b-57d3-404e-b5b2-f864b1a6971f",
+						"exec": [
+							"pm.test(\"Change user name\", () => {",
+							"    pm.response.to.have.status(200);",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "auth-token",
+						"value": "{{auth-token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"root\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/user/{{user}}/name",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"user",
+						"{{user}}",
+						"name"
+					]
+				},
+				"description": "Update information about users, giving, requestis:\nhttp://localhost:3000/api/user/:id/name\nwhere id is DB users _id. Can change <name> to any other property in user schema, like \"lastName\""
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:3000/api/user/{{user}}/email",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "a43c8966-54e8-44ce-9970-e670aaaa55b8",
+						"exec": [
+							"pm.test(\"Change user email\", () => {",
+							"    pm.response.to.have.status(200);",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json",
+						"disabled": true
+					},
+					{
+						"key": "auth-token",
+						"type": "text",
+						"value": "{{auth-token}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"root2@localhost.com\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/user/{{user}}/email",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"user",
+						"{{user}}",
+						"email"
+					]
+				},
+				"description": "Update information about users, giving, requestis:\nhttp://localhost:3000/api/user/:id/name\nwhere id is DB users _id. Can change <name> to any other property in user schema, like \"lastName\""
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:3000/api/user/{{user}}/password",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "99321c33-6763-4b28-b054-128d4d0527c8",
+						"exec": [
+							"pm.test(\"Change user name\", () => {",
+							"    pm.response.to.have.status(200);",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "auth-token",
+						"value": "{{auth-token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"oldPassword\": {{userPass}},\n    \"password\": \"root\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/user/{{user}}/password",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"user",
+						"{{user}}",
+						"password"
+					]
+				},
+				"description": "Update information about users, giving, requestis:\nhttp://localhost:3000/api/user/:id/name\nwhere id is DB users _id. Can change <name> to any other property in user schema, like \"lastName\""
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

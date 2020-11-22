@@ -3,7 +3,7 @@ const joi = require("joi");
 const Group = require("../models/Group");
 const { request, response } = require("express");
 const auth = require("../verifyToken");
-const group = require("../validationSchemas/group");
+const groupValidation = require("../validationSchemas/group");
 const User = require("../models/User");
 const admin = require("../admins");
 const { deleteOne, update } = require("../models/Group");
@@ -11,7 +11,7 @@ const Machines = require("../models/Machines");
 const verifyAdmin = require("../verifyUser");
 
 router.post("/", auth, verifyAdmin, async (request, response) => {
-  const { validationError } = group(request.body);
+  const { validationError } = groupValidation(request.body);
 
   if (validationError) {
     return response.status(400).send(validationError);
@@ -106,8 +106,6 @@ router.put("/:group_id/users", auth, verifyAdmin, async (request, response) => {
     (err, doc) => {
       if (err) {
         return response.status(400).send(err);
-      } else if (doc) {
-        return response.status(400).send({ message: "User already added" });
       } else {
         return response.status(200).send({ message: "Added" });
       }
@@ -150,14 +148,10 @@ router.put(
 
     const { updated } = Group.findOneAndUpdate(
       { _id: request.params.group_id },
-      { $addToSetd: { machines: request.body.machine_id } },
+      { $addToSet: { machines: request.body.machine_id } },
       (err, docs) => {
         if (err) {
           return response.status(400).send(err);
-        } else if (docs) {
-          return response
-            .status(400)
-            .send({ message: "Machine already added to group" });
         } else {
           return response.status(200).send({ message: "Updated" });
         }

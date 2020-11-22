@@ -1,0 +1,417 @@
+{
+	"info": {
+		"_postman_id": "25ee0a0b-088b-48b6-8fb7-788e011e468c",
+		"name": "group",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "users",
+			"item": [
+				{
+					"name": "http://localhost:3000/api/group",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8ea3e1b2-0b94-4064-a486-8ad9894a17d2",
+								"exec": [
+									"pm.test(\"Delete machine from group\", () => {",
+									"    pm.response.to.have.status(200);",
+									"    pm.response.to.have.jsonBody();",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "auth-token",
+								"value": "{{auth-token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user_id\": \"{{user}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/group/{{group}}/users",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"group",
+								"{{group}}",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "http://localhost:3000/api/group",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "91cf7a5d-431a-427d-9fed-da8a11196d76",
+								"exec": [
+									"pm.test(\"Delete machine from group\", () => {",
+									"    pm.response.to.have.status(200);",
+									"    pm.response.to.have.jsonBody();",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "auth-token",
+								"value": "{{auth-token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/group/{{group}}/users/{{user}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"group",
+								"{{group}}",
+								"users",
+								"{{user}}"
+							]
+						},
+						"description": "delete user from group"
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "machines",
+			"item": [
+				{
+					"name": "http://localhost:3000/api/group/machines/5fb13b16973fe6d2ca9b0685",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "dc733287-0a18-4567-8fec-b22394cd1f9a",
+								"exec": [
+									"pm.test(\"Put machine to group\", () => {",
+									"    pm.response.to.have.status(200);",
+									"    pm.response.to.have.jsonBody();",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "auth-token",
+								"value": "{{auth-token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"machine_id\": \"{{machine}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/group/{{group}}/machines",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"group",
+								"{{group}}",
+								"machines"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "http://localhost:3000/api/group/{{group}}/machines/{{machine}}",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "d0a18f37-c963-4a7f-9114-a0b8a7e30847",
+								"exec": [
+									"pm.test(\"Delete machine from given group\", () => {",
+									"    pm.response.to.have.status(200);",
+									"    pm.response.to.have.jsonBody();",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "auth-token",
+								"type": "text",
+								"value": "{{auth-token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/group/{{group}}/machines/{{machine}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"group",
+								"{{group}}",
+								"machines",
+								"{{machine}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "http://localhost:3000/api/group",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "6e5a3171-74ba-41c2-9ca5-accaabebacab",
+						"exec": [
+							"pm.test(\"Add a new group\", () => {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.jsonBody();",
+							"",
+							"    var data = pm.response.json();",
+							"",
+							"    pm.globals.set(\"group\", data._id);",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "auth-token",
+						"value": "{{auth-token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"testGroup\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/group",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"group"
+					]
+				},
+				"description": "Crete new group"
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:3000/api/group",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c4c039f2-5a58-43ab-a221-a1496a335581",
+						"exec": [
+							"pm.test(\"Get groups\", () => {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.jsonBody();",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "auth-token",
+						"value": "{{auth-token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/group",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"group"
+					]
+				},
+				"description": "Get all groups (if admin else user group belonging)"
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:3000/api/group",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "auth-token",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmIxMTZlZGVmYzVjMWJkOWZiMTk4OGYiLCJpYXQiOjE2MDU0NDk3MDIsImV4cCI6MTYwNTQ1NjkwMn0.4NmVEWNBwld6McdjFgU6IIVWM-SaV4VMP0p6VYjmH4s",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/group/5fb13a9521ccfed1d7673eb6",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"group",
+						"5fb13a9521ccfed1d7673eb6"
+					]
+				},
+				"description": "Delete group"
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:3000/api/group",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "auth-token",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmIxMTZlZGVmYzVjMWJkOWZiMTk4OGYiLCJpYXQiOjE2MDU0NDE5NzUsImV4cCI6MTYwNTQ0OTE3NX0.XSdhSOj9-Pf6_TjzkKXIxljupIS_ZoCkdrwil6sRty0",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"changedGroupName\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/group/5fb12ed7fae76cbed1972c86/name",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"group",
+						"5fb12ed7fae76cbed1972c86",
+						"name"
+					]
+				},
+				"description": "Change group name"
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

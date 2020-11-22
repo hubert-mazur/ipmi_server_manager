@@ -1,0 +1,75 @@
+{
+	"info": {
+		"_postman_id": "1a383264-b7d0-46f2-b339-f9ff9c2ed435",
+		"name": "login",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "http://localhost:3000/api/login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "32f31733-4f1d-4573-ad67-fb083d7bf9d3",
+						"exec": [
+							"pm.test(\"Login to page with full and proper credentials\", () => {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.body;",
+							"    pm.globals.set('auth-token', pm.response.headers.get('auth-token'))",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "auth-token",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1Zjc5YjAzMDFkZTJkZTYzODE4OGJjNDYiLCJpYXQiOjE2MDU0MzMzNDh9.E9BYHk01v0qN_el75IYwthznrkIZp3vNtQhAJZDdcP4",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"root@localhost.com\",\n    \"password\": \"rootroot\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"login"
+					]
+				},
+				"description": "Logging in"
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

@@ -1,0 +1,331 @@
+{
+	"info": {
+		"_postman_id": "820e1b2a-fb94-4c93-9efe-b782a637d410",
+		"name": "machine",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "http://localhost:3000/api/machine",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "e62ed7e5-9cac-41dc-806a-2cccd8d5ed91",
+						"exec": [
+							"pm.test(\"Get machines list\", () => {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.jsonBody();",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "auth-token",
+						"value": "{{auth-token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/machine",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"machine"
+					]
+				},
+				"description": "Get list of all machines"
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:3000/api/machine",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c1394bd5-8fbe-4dce-a54e-90df73be3154",
+						"exec": [
+							"pm.test(\"Create new machine\", () => {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.jsonBody();",
+							"",
+							"    var data = pm.response.json();",
+							"    console.log(data._id)",
+							"    pm.globals.set(\"machine\", data._id);",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "auth-token",
+						"value": "{{auth-token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"machine1\",\n    \"IP\": \"10.0.0.0\",\n    \"user\": \"root\",\n    \"password\": \"root\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/machine",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"machine"
+					]
+				},
+				"description": "Add a new machine"
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:3000/api/machine/{{machine}}/name",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "01769c5d-4aa2-4884-8578-1c96159eb622",
+						"exec": [
+							"pm.test(\"Change machine name\", () => {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.jsonBody();",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "auth-token",
+						"value": "{{auth-token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"machine01\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/machine/{{machine}}/name",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"machine",
+						"{{machine}}",
+						"name"
+					]
+				},
+				"description": "Change machine's name"
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:3000/api/machine/{{machine}}/IP",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "25a22160-a6e3-42aa-8377-4c2b0a52a218",
+						"exec": [
+							"pm.test(\"Change machine name\", () => {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.jsonBody();",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "auth-token",
+						"value": "{{auth-token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"IP\": \"10.10.0.1\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/machine/5fb14c49f89d5aec9b6cfd46/IP",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"machine",
+						"5fb14c49f89d5aec9b6cfd46",
+						"IP"
+					]
+				},
+				"description": "Change machine's IP"
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:3000/api/machine/{{machine}}/user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "aa33153a-4928-44a2-a575-be2dbe1a4198",
+						"exec": [
+							"pm.test(\"Change machine name\", () => {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.jsonBody();",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "auth-token",
+						"type": "text",
+						"value": "{{auth-token}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"user\": \"root\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/machine/{{machine}}/user",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"machine",
+						"{{machine}}",
+						"user"
+					]
+				},
+				"description": "Change machine's user"
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:3000/api/machine/{{machine}}/password",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "9e4bda4e-9ce1-4769-9b3c-6925abce30c4",
+						"exec": [
+							"pm.test(\"Change machine name\", () => {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.jsonBody();",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "auth-token",
+						"type": "text",
+						"value": "{{auth-token}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"password\": \"root\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/machine/{{machine}}/password",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"machine",
+						"{{machine}}",
+						"password"
+					]
+				},
+				"description": "Change machine's password"
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
