@@ -23,6 +23,11 @@ const userSchema = new mongoose.Schema({
     min: 6,
     max: 2048,
   },
+  machines: {
+    type: Array,
+    required: true,
+    default: []
+  },
 
   isAdmin: {
     type: Boolean,

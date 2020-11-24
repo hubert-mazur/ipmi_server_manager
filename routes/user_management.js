@@ -9,6 +9,7 @@ const e = require("express");
 const admin = require("../admins");
 const { verify } = require("jsonwebtoken");
 const verifyAdmin = require("../verifyUser");
+const Machine = require("../models/Machines");
 
 // add a new user to database
 router.post("/", auth, verifyAdmin, async (request, response) => {
@@ -53,6 +54,14 @@ router.delete("/:user_id", auth, async (request, response) => {
       .status(401)
       .send({ message: "You are not allowed to delete other users" });
   }
+
+  const {user} = await User.findOne({_id: request.params.user_id});
+
+  if (!user) {
+    return response.status(400).send({message: "No user with given _id exists"});
+  }
+
+  const deletedMachines = await Machine.deleteMany({_id: user.machines});
 
   const deleted = User.deleteOne(
     { _id: request.params.user_id },
@@ -151,5 +160,47 @@ router.patch("/:user_id/password", auth, async (request, response) => {
     else return response.status(200).send({ message: "updated" });
   });
 });
+
+router.put("/:user_id/machines/", auth, verifyAdmin, async (request,response) =>{
+  const machineExists = await Machines.exists({
+    _id: request.body.machine_id,
+  });
+
+  if (!machineExists) {
+    return response.status(400).send({ message: "No such machine exists" });
+  }
+
+  const { updated } = User.findOneAndUpdate(
+    { _id: request.params.user_id },
+    { $addToSet: { machines: request.body.machine_id } },
+    (err, docs) => {
+      if (err) {
+        return response.status(400).send(err);
+      } else {
+        return response.status(200).send({ message: "Updated" });
+      }
+    }
+  );
+});
+
+
+router.delete(
+  "/:user_id/machines/:machine_id",
+  auth,
+  verifyAdmin,
+  async (request, response) => {
+    const deleted = User.findOneAndUpdate(
+      { _id: request.params.user_id },
+      { $pull: { machines: request.params.machine_id } },
+      (err, docs) => {
+        if (err) {
+          return response.status(400).send(err);
+        } else {
+          return response.status(200).send({ message: "deleted" });
+        }
+      }
+    );
+  }
+);
 
 module.exports = router;
