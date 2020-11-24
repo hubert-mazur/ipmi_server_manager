@@ -55,10 +55,16 @@ router.delete("/:user_id", auth, async (request, response) => {
       .send({ message: "You are not allowed to delete other users" });
   }
 
-  const {user} = await User.findOne({_id: request.params.user_id});
+  const user = await User.findOne({_id: request.params.user_id}, (err, docs) => {
+    if (err) {
+      return response.status(400).send({message: err});
+    } else if (!docs) {
+        return response.status(400).send({message: "No user with given _id exists"});
+    } 
+  });
 
   if (!user) {
-    return response.status(400).send({message: "No user with given _id exists"});
+    return user;
   }
 
   const deletedMachines = await Machine.deleteMany({_id: user.machines});
@@ -78,12 +84,13 @@ router.delete("/:user_id", auth, async (request, response) => {
 // get all users in DB
 router.get("/", auth, async (request, response) => {
   selection = {};
+  const isAdmin = await admin(request._id);
 
-  if (!admin(request._id)) {
-    selection = { _id: request._id };
+ if (!isAdmin) {
+    selection = { _id: request._id }; 
   }
 
-  const users = await User.find().select("-password");
+  const users = await User.find(selection).select("-password");
 
   if (!users) {
     return response.status(400).response(users);
@@ -162,7 +169,7 @@ router.patch("/:user_id/password", auth, async (request, response) => {
 });
 
 router.put("/:user_id/machines/", auth, verifyAdmin, async (request,response) =>{
-  const machineExists = await Machines.exists({
+  const machineExists = await Machine.exists({
     _id: request.body.machine_id,
   });
 

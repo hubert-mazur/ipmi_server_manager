@@ -13,7 +13,7 @@ router.post("/", auth, verifyAdmin, async (request, response) => {
   const { validationStatus } = validation(request.body);
 
   if (validationStatus) {
-    return response.status(401).send(validationStatus);
+    return response.status(400).send(validationStatus);
   }
 
   const machine = new Machine({
@@ -23,16 +23,18 @@ router.post("/", auth, verifyAdmin, async (request, response) => {
     password: request.body.password,
   });
 
-  try {
-    const savedMachine = await machine.save();
-    response.status(200).send({ _id: savedMachine._id });
-  } catch (err) {
-    response.status(400).send(err);
-  }
+  const savedMachine = await machine.save((err, docs) => {
+    if (err) {
+      return response.status(400).send(err);
+    } else {
+      return response.status(200).send({ _id: docs._id });
+    }
+  });
 });
 
 router.get("/", auth, async (request, response) => {
-  if (admin(request._id)) {
+  const isAdmin = await admin(request._id);
+  if (isAdmin) {
     const machines = await Machine.find((err, docs) => {
       if (err) {
         return response.status(400).send(err);
@@ -42,12 +44,23 @@ router.get("/", auth, async (request, response) => {
       return response.status(200).send(machines);
     }
   } else {
-    const machines = await Group.find(
-      { users: { $contains: request._id } },
-      (err, docs) => {
-        return err;
+    const user = await User.findOne({ _id: request._id }, (err, docs) => {
+      if (err) {
+        return response.status(400).send({ message: err });
+      } else if (!docs) {
+        return response
+          .status(400)
+          .send({ message: "No user with given _id exists" });
       }
-    ).select("machines, -_id");
+    });
+
+    if (!user) {
+      return user;
+    }
+
+    const machines = await Machine.find({ _id: user.machines }, (err, docs) => {
+      return err;
+    });
 
     if (!machines) {
       return response.status(400).send(machines);
@@ -58,7 +71,16 @@ router.get("/", auth, async (request, response) => {
 });
 
 router.delete("/:machine_id", auth, verifyAdmin, async (request, response) => {
-  const { deleted } = await Machine.deleteOne(
+  const updated = User.updateMany(
+    { machines: { "$in": [request.params.machine_id] } },
+    { $pull: { machines: request.params.machine_id} }, (err, raw)=> {
+      if (err) {
+        console.error(err);
+      }
+    }
+  );
+
+  const deleted = await Machine.deleteOne(
     {
       _id: request.params.machine_id,
     },

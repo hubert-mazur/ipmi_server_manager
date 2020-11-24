@@ -7,7 +7,7 @@ const jwt = require('jsonwebtoken');
 
 router.post("/", async (request, response) => {
   
-  const {error} = validationSchemas.loginValifation(request.body);
+  const {error} = validationSchemas.loginValidation(request.body);
   if (error) {
       response.status(400).send(error)
   }
