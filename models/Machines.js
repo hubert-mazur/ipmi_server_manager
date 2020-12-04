@@ -1,3 +1,4 @@
+const { number } = require("joi");
 const mongoose = require("mongoose");
 
 const MachineSchema = new mongoose.Schema({
@@ -9,6 +10,10 @@ const MachineSchema = new mongoose.Schema({
     IP: {
         type: String,
         max: 15
+    },
+    port: {
+        type: String,
+        default: 623
     },
 
     user: {
