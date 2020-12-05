@@ -106,7 +106,9 @@ router.delete("/:machine_id", auth, verifyAdmin, async (request, response) => {
       if (err) {
         return response.status(400).send({ error: true, meta: "", body: err });
       } else {
-        return response.status(200).send({ error: false, meta:"OK", body:"" });
+        return response
+          .status(200)
+          .send({ error: false, meta: "OK", body: "" });
       }
     }
   );
