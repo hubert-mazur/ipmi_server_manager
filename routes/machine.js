@@ -10,11 +10,13 @@ const User = require("../models/User");
 const verifyAdmin = require("../verifyUser");
 const ipmi = require("../ipmiManagement");
 const { update } = require("../models/Machines");
+const errLog = require("../errorLog");
 
 router.post("/", auth, verifyAdmin, async (request, response) => {
   const { validationStatus } = validation(request.body);
 
   if (validationStatus) {
+    errLog(validationStatus, request._id);
     return response
       .status(400)
       .send({ error: true, meta: "validation error", body: validationStatus });
@@ -30,6 +32,7 @@ router.post("/", auth, verifyAdmin, async (request, response) => {
 
   const savedMachine = await machine.save((err, docs) => {
     if (err) {
+      errLog(err, request._id);
       return response.status(400).send({ error: true, meta: "", body: err });
     } else {
       return response
@@ -44,6 +47,7 @@ router.get("/", auth, async (request, response) => {
   if (isAdmin) {
     const machines = await Machine.find((err, docs) => {
       if (err) {
+        errLog(err, request._id);
         return { error: true, meta: "", body: err };
       }
     });
@@ -57,6 +61,7 @@ router.get("/", auth, async (request, response) => {
   } else {
     const user = await User.findOne({ _id: request._id }, (err, docs) => {
       if (err) {
+        errLog(err, request._id);
         return { error: true, meta: "", body: err };
       } else if (!docs) {
         return { error: true, meta: "Not found", body: "" };
@@ -68,7 +73,10 @@ router.get("/", auth, async (request, response) => {
     }
 
     const machines = await Machine.find({ _id: user.machines }, (err, docs) => {
-      if (err) return { error: true, meta: "", body: err };
+      if (err) {
+        errLog(err, request._id);
+        return { error: true, meta: "", body: err };
+      }
     });
 
     if (machines.error) {
@@ -87,6 +95,7 @@ router.delete("/:machine_id", auth, verifyAdmin, async (request, response) => {
     { $pull: { machines: request.params.machine_id } },
     (err, raw) => {
       if (err) {
+        errLog(err, request._id);
         return { error: true, meta: "", body: "err" };
       } else {
         return { error: false, meta: "", body: "" };
@@ -104,6 +113,7 @@ router.delete("/:machine_id", auth, verifyAdmin, async (request, response) => {
     },
     (err, docs) => {
       if (err) {
+        errLog(err, request._id);
         return response.status(400).send({ error: true, meta: "", body: err });
       } else {
         return response
@@ -124,6 +134,7 @@ router.patch(
       { name: request.body.name },
       (err, docs) => {
         if (err) {
+          errLog(err, request._id);
           return response
             .status(400)
             .send({ error: true, meta: "", body: err });
@@ -145,6 +156,7 @@ router.patch(
       { IP: request.body.IP },
       (err) => {
         if (err) {
+          errLog(err, request._id);
           return response
             .status(400)
             .send({ error: true, meta: "", body: err });
@@ -166,6 +178,7 @@ router.patch(
       { user: request.body.user },
       (err) => {
         if (err) {
+          errLog(err, request._id);
           return response
             .status(400)
             .send({ error: true, meta: "", body: err });
@@ -189,6 +202,7 @@ router.patch(
       { password: request.body.password },
       (err) => {
         if (err) {
+          errLog(err, request._id);
           return response
             .status(400)
             .send({ error: true, meta: "", body: err });
@@ -210,6 +224,7 @@ router.get(
       request.params.machine_id,
       (err, docs) => {
         if (err) {
+          errLog(err, request._id);
           return { error: true, meta: "", body: err };
         }
 
@@ -257,6 +272,7 @@ router.get(
       request.params.machine_id,
       (err, docs) => {
         if (err) {
+          errLog(err, request._id);
           return { error: true, meta: "", body: err };
         }
 
