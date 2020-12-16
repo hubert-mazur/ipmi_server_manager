@@ -15,11 +15,13 @@ const errLog = require("../errorLog");
 // add a new user to database
 router.post("/", auth, verifyAdmin, async (request, response) => {
   //validate user data
-  const { err } = validation.registerValidation(request.body);
+  const err = await validation.registerValidation(request.body);
 
-  if (err) {
+  if (err.error) {
     errLog(err, request._id);
-    return response.status(400).send({ error: true, meta: "", body: err });
+    return response
+      .status(400)
+      .send({ error: true, meta: "validationError", body: err });
   }
 
   // check if user is not already in DB
@@ -41,6 +43,7 @@ router.post("/", auth, verifyAdmin, async (request, response) => {
     lastName: request.body.lastName,
     email: request.body.email,
     password: hashedPass,
+    isAdmin: request.body.admin,
   });
 
   try {
@@ -80,22 +83,7 @@ router.delete("/:user_id", auth, async (request, response) => {
     return user;
   }
 
-  const deletedMachines = await Machine.deleteMany({ _id: user.machines });
-
-  const deleted = User.deleteOne(
-    { _id: request.params.user_id },
-    function (err) {
-      if (err) {
-        errLog(err, request._id);
-        return response.status(400).send({ error: true, meta: "", body: err });
-      } else {
-        return response
-          .status(200)
-          .send({ error: false, meta: "OK", body: "" });
-      }
-    }
-  );
-  return deleted;
+  return response.status(200).send({ error: false, meta: "OK", body: "" });
 });
 
 // get all users in DB
@@ -106,6 +94,20 @@ router.get("/", auth, async (request, response) => {
   if (!isAdmin) {
     selection = { _id: request._id };
   }
+
+  const users = await User.find(selection).select("-password");
+
+  if (!users) {
+    return response
+      .status(400)
+      .response({ error: true, meta: "", body: users });
+  }
+
+  return response.status(200).send({ error: false, meta: "", body: users });
+});
+
+router.get("/identity", auth, async (request, response) => {
+  const selection = { _id: request._id };
 
   const users = await User.find(selection).select("-password");
 
@@ -223,7 +225,7 @@ router.put(
         .send({ error: true, meta: "", body: "No such machine exists" });
     }
 
-    const { updated } = User.findOneAndUpdate(
+    const updated = await User.findOneAndUpdate(
       { _id: request.params.user_id },
       { $addToSet: { machines: request.body.machine_id } },
       (err, docs) => {
@@ -239,6 +241,16 @@ router.put(
         }
       }
     );
+
+    try {
+      await Machine.findOneAndUpdate(
+        { _id: request.body.machine_id },
+        { assigned: true }
+      );
+    } catch (err) {
+      return reponse.status(400).send({ error: true, meta: "", body: err });
+    }
+
     return updated;
   }
 );
@@ -264,6 +276,21 @@ router.delete(
         }
       }
     );
+
+    try {
+      const exists = await User.find({
+        machines: { $in: [request.params.machine_id] },
+      });
+
+      if (exists.length == 0) {
+        await Machine.findByIdAndUpdate(
+          { _id: request.params.machine_id },
+          { assigned: false }
+        );
+      }
+    } catch (err) {
+      return response.status(400).send({ error: true, meta: "", body: err });
+    }
     return deleted;
   }
 );

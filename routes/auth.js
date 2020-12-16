@@ -7,9 +7,9 @@ const jwt = require('jsonwebtoken');
 
 router.post("/", async (request, response) => {
   
-  const {error} = validationSchemas.loginValidation(request.body);
-  if (error) {
-      response.status(400).send(error)
+  const err = await validationSchemas.loginValidation(request.body);
+  if (err.error) {
+      return response.status(400).send(error)
   }
   
   const user = await User.findOne({email: request.body.email})
@@ -23,7 +23,7 @@ router.post("/", async (request, response) => {
   } 
 
   const token = jwt.sign({_id: user._id}, process.env.SECRET_TOKEN, {expiresIn: '2h'});
-  response.header('auth-token', token).send(token);
+  return response.header('auth-token', token).status(200).send(token);
 });
 
 module.exports = router;

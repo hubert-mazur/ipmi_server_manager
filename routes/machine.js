@@ -28,6 +28,7 @@ router.post("/", auth, verifyAdmin, async (request, response) => {
     port: request.body.port,
     user: request.body.user,
     password: request.body.password,
+    assigned: false,
   });
 
   const savedMachine = await machine.save((err, docs) => {
@@ -87,6 +88,55 @@ router.get("/", auth, async (request, response) => {
       .status(200)
       .send({ error: false, meta: "", body: machines });
   }
+});
+
+router.get("/unassigned", auth, verifyAdmin, async (request, response) => {
+  try {
+    const machine = await Machine.find({ assigned: false });
+    console.error(machine);
+    return response
+      .status(200)
+      .send({ error: false, meta: "OK", body: machine });
+  } catch (err) {
+    console.error(err);
+    return response.status(400).send({ error: true, meta: "", body: err });
+  }
+});
+
+router.get("/owned/:user_id?", auth, async (request, response) => {
+
+  let id = 0;
+  if (request.params.user_id) id = request.params.user_id;
+  else id = request._id;
+
+  const user = await User.findOne(
+    { _id: id },
+    (err, docs) => {
+      if (err) {
+        errLog(err, request._id);
+        return { error: true, meta: "", body: err };
+      } else if (!docs) {
+        return { error: true, meta: "Not found", body: "" };
+      }
+    }
+  );
+
+  if (user.error) {
+    return user;
+  }
+
+  const machines = await Machine.find({ _id: user.machines }, (err, docs) => {
+    if (err) {
+      errLog(err, request._id);
+      return { error: true, meta: "", body: err };
+    }
+  });
+
+  if (machines.error) {
+    return response.status(400).send(machines);
+  }
+  console.error(user);
+  return response.status(200).send({ error: false, meta: "", body: machines });
 });
 
 router.delete("/:machine_id", auth, verifyAdmin, async (request, response) => {
