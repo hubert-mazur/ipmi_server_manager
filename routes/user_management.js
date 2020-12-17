@@ -19,13 +19,11 @@ router.post("/", auth, verifyAdmin, async (request, response) => {
 
   if (err.error) {
     errLog(err, request._id);
-    return response
-      .status(400)
-      .send({
-        error: true,
-        meta: "validationError",
-        body: err.error.details[0].message,
-      });
+    return response.status(400).send({
+      error: true,
+      meta: "validationError",
+      body: err.error.details[0].message,
+    });
   }
 
   // check if user is not already in DB
@@ -62,32 +60,38 @@ router.post("/", auth, verifyAdmin, async (request, response) => {
 // delete user with given _id
 router.delete("/:user_id", auth, async (request, response) => {
   if (!admin(request._id) && request.params.user_id != request._id) {
-    return response.status(401).send({
+    return response.status(404).send({
       error: true,
       meta: "",
       body: "You are not allowed to delete other users",
     });
   }
 
-  const user = await User.findOne(
-    { _id: request.params.user_id },
-    (err, docs) => {
-      if (err) {
-        errLog(err, request._id);
-        return response.status(400).send({ error: true, meta: "", body: err });
-      } else if (!docs) {
-        return response
-          .status(400)
-          .send({ message: "No user with given _id exists" });
+  try {
+    const Machines = await User.findById(request.params.user_id).select(
+      "-_id machines"
+    );
+    console.error(Machines);
+
+    for (let i = 0; i < Machines.machines.length; i++) {
+      const exists = await User.find({
+        machines: { $in: [Machines.machines[i]] },
+      });
+      console.error(`Assignment count: ${exists.length - 1}`);
+      if (exists.length - 1 == 0) {
+        await Machine.findByIdAndUpdate(
+          { _id: Machines.machines[i] },
+          { assigned: false }
+        );
       }
     }
-  );
 
-  if (!user) {
-    return user;
+    await User.findByIdAndRemove({ _id: request.params.user_id });
+    return response.status(200).send({ error: false, meta: "", body: "OK" });
+  } catch (err) {
+    console.error(err);
+    return response.status(400).send({ error: true, meta: "", body: err });
   }
-
-  return response.status(200).send({ error: false, meta: "OK", body: "" });
 });
 
 // get all users in DB
@@ -191,16 +195,18 @@ router.patch("/:user_id/password", auth, async (request, response) => {
   if (!admin(request._id) && request._id != request.params.user_id) {
     return response.status(401).send({ message: "You are not admin" });
   }
-
   const user = User.findOne({ _id: request.params.user_id });
   if (!user) return response.status(400).send({ message: "user not found" });
-  compareStatus = await bcrypt.compare(
-    request.body.oldPassword,
-    (await user).password
-  );
+  const isAdmin = await admin(request._id);
+  if (! isAdmin) {
+    compareStatus = await bcrypt.compare(
+      request.body.oldPassword,
+      (await user).password
+    );
 
-  if (!compareStatus)
-    return response.status(400).send({ message: "Password mismatch" });
+    if (!compareStatus)
+      return response.status(400).send({ message: "Password mismatch" });
+  }
 
   const salt = await bcrypt.genSalt();
   const hashedPass = await bcrypt.hash(request.body.password, salt);
