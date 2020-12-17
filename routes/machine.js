@@ -240,8 +240,8 @@ router.patch(
 
 router.patch(
   "/:machine_id/password",
-  verifyAdmin,
   auth,
+  verifyAdmin,
   async (request, response) => {
     const { updated } = Machine.findOneAndUpdate(
       { _id: request.params.machine_id },
