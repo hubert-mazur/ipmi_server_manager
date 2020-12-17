@@ -21,7 +21,11 @@ router.post("/", auth, verifyAdmin, async (request, response) => {
     errLog(err, request._id);
     return response
       .status(400)
-      .send({ error: true, meta: "validationError", body: err });
+      .send({
+        error: true,
+        meta: "validationError",
+        body: err.error.details[0].message,
+      });
   }
 
   // check if user is not already in DB

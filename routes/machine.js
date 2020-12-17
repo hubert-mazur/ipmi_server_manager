@@ -104,22 +104,18 @@ router.get("/unassigned", auth, verifyAdmin, async (request, response) => {
 });
 
 router.get("/owned/:user_id?", auth, async (request, response) => {
-
   let id = 0;
   if (request.params.user_id) id = request.params.user_id;
   else id = request._id;
 
-  const user = await User.findOne(
-    { _id: id },
-    (err, docs) => {
-      if (err) {
-        errLog(err, request._id);
-        return { error: true, meta: "", body: err };
-      } else if (!docs) {
-        return { error: true, meta: "Not found", body: "" };
-      }
+  const user = await User.findOne({ _id: id }, (err, docs) => {
+    if (err) {
+      errLog(err, request._id);
+      return { error: true, meta: "", body: err };
+    } else if (!docs) {
+      return { error: true, meta: "Not found", body: "" };
     }
-  );
+  });
 
   if (user.error) {
     return user;
@@ -313,6 +309,48 @@ router.get(
   }
 );
 
+router.get("/:machine_id/sensor", auth, async (request, response) => {
+  const machine = await Machine.findById(
+    request.params.machine_id,
+    (err, docs) => {
+      if (err) {
+        errLog(err, request._id);
+        return { error: true, meta: "", body: err };
+      }
+
+      if (!docs) {
+        return {
+          error: true,
+          meta: "",
+          body: { message: "No such machine" },
+        };
+      }
+    }
+  );
+
+  if (!machine || machine.error) {
+    return response.status(400).send({ error: true, meta: "", body: machine });
+  }
+
+  result = await ipmi.sensorsReading(machine);
+  if (result.error) {
+    return response.status(400).send(result);
+  }
+
+  result = result.body;
+
+  result = result.split(/\r?\n/);
+
+  let out = [];
+  for (let i = 0; i < result.length; i++) {
+    out.push([result[i].split("|")]);
+  }
+
+  // console.error(out);
+
+  return response.status(200).send({ error: false, meta: "", body: out });
+});
+
 router.get(
   "/:machine_id/chassis/bootdev/:option?",
   auth,
@@ -366,6 +404,54 @@ router.get(
     return response
       .status(200)
       .send({ error: false, meta: "Help", body: result });
+  }
+);
+
+router.get(
+  "/:machine_id/chassis/bootparam/",
+  auth,
+  verifyAdmin,
+  async (request, response) => {
+    const machine = await Machine.findById(
+      request.params.machine_id,
+      (err, docs) => {
+        if (err) {
+          errLog(err, request._id);
+          return { error: true, meta: "", body: err };
+        }
+
+        if (!docs) {
+          return {
+            error: true,
+            meta: "",
+            body: { message: "No such machine" },
+          };
+        }
+      }
+    );
+
+    if (!machine || machine.error) {
+      return response
+        .status(400)
+        .send({ error: true, meta: "", body: machine });
+    }
+
+    result = await ipmi.getBootDevice(machine, request.params.option);
+
+    if (result.error && result.meta != "stderr") {
+      return response.status(400).send(result);
+    }
+
+    result = result.body;
+    result = result
+      .substring(result.search(/Boot Device Selector/))
+      .split("\n")[0]
+      .split(" ");
+    result = result[result.length - 1].toLowerCase();
+
+    console.error(result);
+
+    return response.status(200).send({ error: false, meta: "", body: result });
   }
 );
 

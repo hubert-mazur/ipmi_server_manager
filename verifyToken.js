@@ -14,7 +14,7 @@ module.exports = function auth(request, response, next) {
       process.env.SECRET_TOKEN,
       (err, decodedToken) => {
         if (err) {
-          return response.status(400).send({ message: "invalid token" });
+          return response.status(401).send({ message: "invalid token" });
         } else {
           request._id = decodedToken._id;
         }
