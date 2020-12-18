@@ -11,6 +11,7 @@ const verifyAdmin = require("../verifyUser");
 const ipmi = require("../ipmiManagement");
 const { update } = require("../models/Machines");
 const errLog = require("../errorLog");
+const Joi = require("joi");
 
 router.post("/", auth, verifyAdmin, async (request, response) => {
   const { validationStatus } = validation(request.body);
@@ -199,6 +200,24 @@ router.patch(
   auth,
   verifyAdmin,
   async (request, response) => {
+    const schema = Joi.object({
+      IP: Joi.string()
+        .max(15)
+        .regex(
+          /^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/
+        ),
+    });
+
+    const validation = await schema.validate({IP:request.body.IP});
+    console.error(validation.error.details)
+    if (validation.error) {
+      return response.status(400).send({
+        error: true,
+        meta: "validation error",
+        body: validation.error.details[0].message,
+      });
+    }
+
     const { updated } = Machine.findOneAndUpdate(
       { _id: request.params.machine_id },
       { IP: request.body.IP },
@@ -261,6 +280,32 @@ router.patch(
         }
       }
     );
+  }
+);
+
+router.patch(
+  "/:machine_id/script",
+  auth,
+  verifyAdmin,
+  async (request, response) => {
+    console.error(request.body.script);
+    try {
+      if (request.body.script.length == 0) {
+        await Machine.findOneAndUpdate(
+          { _id: request.params.machine_id },
+          { scriptUsage: false, script: "" }
+        );
+      } else {
+        await Machine.findOneAndUpdate(
+          { _id: request.params.machine_id },
+          { scriptUsage: true, script: request.body.script }
+        );
+      }
+      return response.status(200).send({ error: false, meta: "", body: "OK" });
+    } catch (err) {
+      console.error(err);
+      return response.status(400).send({ error: true, meta: "", body: err });
+    }
   }
 );
 

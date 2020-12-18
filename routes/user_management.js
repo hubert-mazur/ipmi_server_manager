@@ -11,6 +11,7 @@ const { verify } = require("jsonwebtoken");
 const verifyAdmin = require("../verifyUser");
 const Machine = require("../models/Machines");
 const errLog = require("../errorLog");
+const Joi = require("joi");
 
 // add a new user to database
 router.post("/", auth, verifyAdmin, async (request, response) => {
@@ -154,6 +155,20 @@ router.patch("/:user_id/email", auth, async (request, response) => {
     return response.status(401).send({ message: "You are not admin" });
   }
 
+  const schema = Joi.object({
+    email: Joi.string().email(),
+  });
+
+  const validation = await schema.validate({ email: request.body.email });
+  console.error(validation.error.details);
+  if (validation.error) {
+    return response.status(400).send({
+      error: true,
+      meta: "validation error",
+      body: validation.error.details[0].message,
+    });
+  }
+
   const user = User.findOneAndUpdate(
     { _id: request.params.user_id },
     { email: request.body.email },
@@ -195,10 +210,25 @@ router.patch("/:user_id/password", auth, async (request, response) => {
   if (!admin(request._id) && request._id != request.params.user_id) {
     return response.status(401).send({ message: "You are not admin" });
   }
+
+  const schema = Joi.object({
+    password: Joi.string().required().max(2048).min(6),
+  });
+
+  const validation = await schema.validate({ password: request.body.password });
+  console.error(validation.error.details);
+  if (validation.error) {
+    return response.status(400).send({
+      error: true,
+      meta: "validation error",
+      body: validation.error.details[0].message,
+    });
+  }
+
   const user = User.findOne({ _id: request.params.user_id });
   if (!user) return response.status(400).send({ message: "user not found" });
   const isAdmin = await admin(request._id);
-  if (! isAdmin) {
+  if (!isAdmin) {
     compareStatus = await bcrypt.compare(
       request.body.oldPassword,
       (await user).password
