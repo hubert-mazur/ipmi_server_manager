@@ -29,6 +29,8 @@ router.post("/", auth, verifyAdmin, async (request, response) => {
     user: request.body.user,
     password: request.body.password,
     assigned: false,
+    scriptUsage: request.body.scriptUsage,
+    script: request.body.script,
   });
 
   const savedMachine = await machine.save((err, docs) => {

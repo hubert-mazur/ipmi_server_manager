@@ -1,4 +1,3 @@
-const { number, boolean, bool } = require("joi");
 const mongoose = require("mongoose");
 
 const MachineSchema = new mongoose.Schema({
@@ -25,6 +24,14 @@ const MachineSchema = new mongoose.Schema({
   },
   assigned: {
     type: Boolean,
+  },
+  scriptUsage: {
+    type: Boolean,
+    default: false,
+  },
+  script: {
+    type: String,
+    default: "",
   },
 });
 
