@@ -50,6 +50,6 @@ app.use("/api/users", userRoute);
 app.use("/api/group", groupRoute);
 app.use("/api/machine", machineRoute);
 
-app.listen(3000, () => {
+app.listen(process.env.PORT, () => {
   console.log("Server started");
 });
