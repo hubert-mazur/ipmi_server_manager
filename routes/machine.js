@@ -14,13 +14,16 @@ const errLog = require("../errorLog");
 const Joi = require("joi");
 
 router.post("/", auth, verifyAdmin, async (request, response) => {
-  const { validationStatus } = validation(request.body);
+  const err = await validation(request.body);
+  if (err.error) {
+    console.error(err);
 
-  if (validationStatus) {
-    errLog(validationStatus, request._id);
-    return response
-      .status(400)
-      .send({ error: true, meta: "validation error", body: validationStatus });
+    errLog(err, request._id);
+    return response.status(400).send({
+      error: true,
+      meta: "validationError",
+      body: err.error.details[0].message,
+    });
   }
 
   const machine = new Machine({
@@ -208,8 +211,8 @@ router.patch(
         ),
     });
 
-    const validation = await schema.validate({IP:request.body.IP});
-    console.error(validation.error.details)
+    const validation = await schema.validate({ IP: request.body.IP });
+    console.error(validation.error.details);
     if (validation.error) {
       return response.status(400).send({
         error: true,
